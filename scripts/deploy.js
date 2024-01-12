@@ -3,22 +3,31 @@ const hre = require("hardhat");
 
 async function main() {
 
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const unlockTime = currentTimestampInSeconds + 60;  
+  const [deployer] = await ethers.getSigners();
 
-  const lockedAmount = hre.ethers.parseEther("0.001");
+  console.log("Deploying contracts with the account:", deployer.address);
 
-  let MyTest = await hre.ethers.deployContract("MyTest", [unlockTime], {
-    value: lockedAmount,
-  });
+  const token = await ethers.deployContract("EXTO");
 
-  await MyTest.waitForDeployment();
+  console.log("Token address:", await token.getAddress());
 
-  const token = await MyTest.attach(MyTest.target);
+  
+  //await token.getChainID();
 
-  const rst = await token.withdraw();
-  console.log(rst);
-  console.log(`contract deployed to: ${MyTest.target}`);
+  // owners.forEach(async owner => {
+  //   let ownerBalance = await extoToken.balanceOf(owner.address);
+  
+  //   console.log(ownerBalance);    
+  // });
+
+
+
+  // //const token = await MyTest.attach(MyTest.target);
+
+
+  // //await token.withdraw();
+  
+  // console.log(`contract deployed to: ${MyTest.target}`);
   
 }
 
