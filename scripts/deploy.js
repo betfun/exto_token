@@ -7,9 +7,9 @@ async function main() {
 
   console.log("Deploying contracts with the account:", deployer.address);
 
-  const token = await ethers.deployContract("EXTO");
+  const contract = await ethers.deployContract("EXTO", ["0x4CB3Fb9E857fb02632cE5a34af9D015A2468416d"]);
 
-  console.log("Token address:", await token.getAddress());
+  console.log("Contract address:", await contract.getAddress());
 
   
   //await token.getChainID();

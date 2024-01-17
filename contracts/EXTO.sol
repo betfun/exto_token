@@ -1,33 +1,8 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity >= 0.8.17;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-//import "hardhat/console.sol";
-
-abstract contract Ownable is Context {
-    address private _owner;
-    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
-    constructor () {
-        _owner = 0x0000000000000000000000000000000000000000;
-        emit OwnershipTransferred(address(0), _owner);
-    }
-    function owner() public view virtual returns (address) {
-        return _owner;
-    }
-    modifier onlyOwner() {
-        require(owner() == _msgSender(), "Ownable: caller is not the owner");
-        _;
-    }
-    function renounceOwnership() public virtual onlyOwner {
-        emit OwnershipTransferred(_owner, address(0));
-        _owner = address(0);
-    }
-    function transferOwnership(address newOwner) public virtual onlyOwner {
-        require(newOwner != address(0), "Ownable: new owner is the zero address");
-        emit OwnershipTransferred(_owner, newOwner);
-        _owner = newOwner;
-    }
-}
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract EXTO is Ownable, IERC20 {
     string private _name;
@@ -37,11 +12,10 @@ contract EXTO is Ownable, IERC20 {
     mapping(address => uint256) private _balances;
     mapping(address => mapping(address => uint256)) private _allowances;
     
-    constructor() payable {
-        _name = "Big Chance Token";
+    constructor(address initialOwner) Ownable(initialOwner) payable {
+        _name = "Exchange Token";
         _symbol = "EXTO";
-        //_totalSupply = 100000000000 * 10**9;
-        _totalSupply = 1000;
+        _totalSupply = 100000000000 * 10**9;        
         _balances[msg.sender] = _totalSupply;
         emit Transfer(address(0), msg.sender, _totalSupply);
     }

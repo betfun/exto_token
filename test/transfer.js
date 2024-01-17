@@ -11,7 +11,9 @@ describe("Token transfer", function () {
     
     const [owner, addr1, addr2] = await ethers.getSigners();
 
-    const hardhatToken = await ethers.deployContract("EXTO");
+    let list = await ethers.getSigners();
+
+    const hardhatToken = await ethers.deployContract("EXTO", ["0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199"]);
 
     // Transfer 50 tokens from owner to addr1
     await hardhatToken.transfer(addr1.address, 50);
@@ -21,6 +23,7 @@ describe("Token transfer", function () {
     await hardhatToken.connect(addr1).transfer(addr2.address, 50);
     expect(await hardhatToken.balanceOf(addr2.address)).to.equal(50);
 
-    
+    let symbol = await hardhatToken.symbol();
+    console.log(symbol);
   });
 });
