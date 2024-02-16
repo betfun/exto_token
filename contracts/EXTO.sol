@@ -1,34 +1,41 @@
 // SPDX-License-Identifier: Unlicense
-pragma solidity >= 0.8.17;
+pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 
-contract EXTO is Ownable, IERC20 {
+contract EXTO is IERC20, Ownable(msg.sender), IERC20Metadata {
+
     string private _name;
-    string private _symbol;
+    string private _symbol;    
+    uint8 private _decimals = 18;
+
     uint256 private _totalSupply;
-    uint8 private _decimals = 9;
+
     mapping(address => uint256) private _balances;
     mapping(address => mapping(address => uint256)) private _allowances;
     
-    constructor(address initialOwner) Ownable(initialOwner) payable {
+    event ExchangeCompleted(address indexed sender, uint256 ethAmount, uint256 tokenAmount);
+
+    constructor() {
         _name = "Exchange Token";
         _symbol = "EXTO";
-        _totalSupply = 100000000000 * 10**9;        
+        _totalSupply = 1_000_000_000 * 10**uint256(_decimals);                         
         _balances[msg.sender] = _totalSupply;
+
         emit Transfer(address(0), msg.sender, _totalSupply);
     }
 
-    function decimals() public view returns (uint8) {
+    function decimals() public view override returns (uint8) {
         return _decimals;
     }
 
-    function name() public view returns (string memory) {
+    function name() public view override returns (string memory) {
         return _name;
     }
 
-    function symbol() public view returns (string memory) {
+    function symbol() public view override returns (string memory) {
         return _symbol;
     }
 
@@ -87,4 +94,17 @@ contract EXTO is Ownable, IERC20 {
         _allowances[owner][spender] = amount;
         emit Approval(owner, spender, amount);
     }
+
+    function exchangeTokens() external payable {
+        require(msg.value > 0, "Must send ETH to exchange for tokens");
+        uint256 tokenAmount = 1000 * msg.value / 1 ether;
+
+        _transfer(owner(), msg.sender, tokenAmount);
+
+        // 이더를 전송한 사용자에게 이더를 반환합니다.
+        payable(owner()).transfer(msg.value);
+
+        // 이벤트를 발생시켜 이더 및 토큰 교환 내역을 기록합니다.
+        emit ExchangeCompleted(msg.sender, msg.value, tokenAmount);
+    }    
 }
